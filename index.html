@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>چت رباتعلی</title>
+<style>
+body {font-family: sans-serif; background:#0f172a; color:white; padding:20px;}
+#chat {height:75vh; overflow-y:auto; background:#1e293b; padding:15px; border-radius:12px;}
+.msg {margin:10px 0; padding:10px; border-radius:8px;}
+.user {background:#2563eb; text-align:right;}
+.bot {background:#334155;}
+input {width:80%; padding:10px; border:none; border-radius:6px;}
+button {padding:10px 15px; border:none; border-radius:6px; background:#10b981; color:white;}
+</style>
+</head>
+<body>
+
+<h2>🤖 چت با رباتعلی</h2>
+<div id="chat"></div>
+
+<br>
+<input id="inp" placeholder="هرچی میخوای بپرس ...">
+<button onclick="ask()">ارسال</button>
+
+<script>
+const API_KEY = "AIzaSyByzB4da3BW9WTtwdBn8ZPeDKsNQ_pnY5w";  // 👈 API رو اینجا قرار بده
+const chatBox = document.getElementById("chat");
+
+function addMsg(text, who){
+    const div = document.createElement("div");
+    div.className = "msg " + who;
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function ask(){
+    const q = document.getElementById("inp").value;
+    addMsg(q, "user");
+    document.getElementById("inp").value = "";
+
+    addMsg("رباتعلی داره فکر می‌کنه...", "bot");
+
+    const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+    {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            contents:[{parts:[{text:q}]}]
+        })
+    });
+
+    const data = await res.json();
+    const ans = data.candidates[0].content.parts[0].text;
+
+    document.querySelector(".bot:last-child").innerText = ans;
+}
+</script>
+
+</body>
+</html>
